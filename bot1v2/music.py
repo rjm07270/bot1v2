@@ -12,7 +12,7 @@ class music(commands.Cog):
     def __init__(self, client):
         self.client =client
         self.queues={}
-        self.ctxs={}
+        
         
         
 
@@ -47,38 +47,44 @@ class music(commands.Cog):
             await ctx.voice_client.disconnect()
     
     @commands.command()
-    async def play(self,ctx,url):
-        if ctx.author.voice is None:
-            await ctx.send("Get into a channel")
-        else:
-            voice_channel = ctx.author.voice.channel
-            if ctx.voice_client is None:
-                await voice_channel.connect()
+    async def play(self,ctx,url=None):
+        if url!=None:
+            if ctx.author.voice is None:
+                await ctx.send("Get into a channel")
+            else:
+                voice_channel = ctx.author.voice.channel
+                if ctx.voice_client is None:
+                    await voice_channel.connect()
 
 
         
-        url=url.strip("<>")
-        FFMPEG_OPTIONS = {'before_options':'-reconnect 1 -reconnect_streamed 1 -reconnect_delay_max 5','options': '-vn'}
-        YDL_OPTIONS = {'format': "bestaudio"}
+            url=url.strip("<>")
+            url= url[0:43]
+            FFMPEG_OPTIONS = {'before_options':'-reconnect 1 -reconnect_streamed 1 -reconnect_delay_max 5','options': '-vn'}
+            YDL_OPTIONS = {'format': "bestaudio"}
         
         
-        info=None
-        with youtube_dl.YoutubeDL(YDL_OPTIONS) as ydl:
-            info = ydl.extract_info(url, download=False)
-            ur12 =info['formats'][0]['url']
+            info=None
+            with youtube_dl.YoutubeDL(YDL_OPTIONS) as ydl:
+                info = ydl.extract_info(url, download=False)
+                ur12 =info['formats'][0]['url']
             
-            source = await discord.FFmpegOpusAudio.from_probe(ur12, **FFMPEG_OPTIONS)
+                source = await discord.FFmpegOpusAudio.from_probe(ur12, **FFMPEG_OPTIONS)
             
-        guild_id = ctx.message.guild.id
-        voice =ctx.guild.voice_client
-        if guild_id in self.queues:
-            self.queues[guild_id].append(source)
-            await ctx.send("Song added")
+            guild_id = ctx.message.guild.id
+            voice =ctx.guild.voice_client
+            if guild_id in self.queues:
+                self.queues[guild_id].append(source)
+                await ctx.send("Song added")
+            else:
+            
+                self.queues[guild_id] = [source]
+                self.queue_start(ctx, guild_id)
+                await ctx.send("Starting voice chat")
         else:
-            
-            self.queues[guild_id] = [source]
-            self.queue_start(ctx, guild_id)
-            await ctx.send("Starting voice chat")
+            ctx.voice_client.resume()
+            await ctx.send("unpause")
+
                 
             
             
@@ -90,6 +96,8 @@ class music(commands.Cog):
 
     @commands.command()
     async def stop(self,ctx):
+        guild_id = ctx.message.guild.id
+        self.queues[guild_id] = []
         ctx.voice_client.stop()
         await ctx.send("stopped")
 
