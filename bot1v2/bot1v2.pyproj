@@ -22,21 +22,28 @@
   </PropertyGroup>
   <ItemGroup>
     <Compile Include="bot1v2.py" />
-    <Compile Include="joke.py">
+    <Compile Include="help.py">
       <SubType>Code</SubType>
     </Compile>
-    <Compile Include="music.py">
+    <Compile Include="cogs\perms.py">
       <SubType>Code</SubType>
     </Compile>
-    <Compile Include="music2.py">
+    <Compile Include="db.py">
       <SubType>Code</SubType>
     </Compile>
-    <Compile Include="musicQueue.py">
+    <Compile Include="cogs\events.py">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="cogs\music.py">
       <SubType>Code</SubType>
     </Compile>
   </ItemGroup>
   <ItemGroup>
     <Content Include=".env" />
+    <Content Include="cogs\.env" />
+  </ItemGroup>
+  <ItemGroup>
+    <Folder Include="cogs\" />
   </ItemGroup>
   <Import Project="$(MSBuildExtensionsPath32)\Microsoft\VisualStudio\v$(VisualStudioVersion)\Python Tools\Microsoft.PythonTools.targets" />
   <!-- Uncomment the CoreCompile target to enable the Build command in
